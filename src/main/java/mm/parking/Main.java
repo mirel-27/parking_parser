@@ -2,8 +2,10 @@ package mm.parking;
 
 import mm.parking.cli.Argument;
 import mm.parking.cli.CommandLine;
+import mm.parking.client.ParkingClient;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class Main {
@@ -11,6 +13,11 @@ public class Main {
     public static final String ARGUMENT_FILE_FORMAT = "format";
     public static final String ARGUMENT_DIR_PATH = "dir";
     public static final String ARGUMENT_HELP = "help";
+
+    public static final String DATA_TYPE_TARGET_PRICE = "price";
+    public static final String DATA_TYPE_TARGET_WORK_HOURS = "time";
+    public static final String DATA_TYPE_TARGET_LOCATION = "location";
+    public static final String DATA_TYPE_TARGET_ALL = "all";
 
     public static final String HELP_PRINTOUT_FORMAT = "%-12s %-35s %-50s\n";
 
@@ -33,10 +40,6 @@ public class Main {
                 System.out.printf("Required argument --%s not set.", ARGUMENT_DATA_TYPE);
                 System.out.println();
                 System.exit(-1);
-            } else {
-                // only one target is expected, discard others if specified
-                var target = dataTargets.get(0);
-
             }
 
             var fileFormats = cli.getArgumentTarget(ARGUMENT_FILE_FORMAT);
@@ -65,6 +68,27 @@ public class Main {
 
             System.out.println("Parsing arguments done.");
 
+            // only one target is expected, discard others
+            var target = dataTargets.get(0);
+            var parkingClient = new ParkingClient();
+            if (target.equals(DATA_TYPE_TARGET_PRICE)) {
+                try {
+                    System.out.println("Downloading parking price information ...");
+                    var priceInfo = parkingClient.fetchParkingPrices();
+                    System.out.println("Download finished.");
+                } catch (IOException e) {
+                    System.out.println("Failed to download parking price information: " + e.getMessage());
+                    System.exit(-1);
+                }
+            } else if (target.equals(DATA_TYPE_TARGET_WORK_HOURS)) {
+                System.out.println("Not supported yet ...");
+            } else if (target.equals(DATA_TYPE_TARGET_LOCATION)) {
+                System.out.println("Not supported yet ...");
+            } else if (target.equals(DATA_TYPE_TARGET_ALL)) {
+                System.out.println("Not supported yet ...");
+            } else {
+                System.out.println("Unknown data target: " + target);
+            }
         } catch (IllegalArgumentException e) {
             System.out.printf("Failed to parse arguments [%s]\n", e.getMessage());
         }
