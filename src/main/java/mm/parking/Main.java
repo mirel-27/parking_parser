@@ -9,17 +9,17 @@ import java.io.IOException;
 import java.util.List;
 
 public class Main {
-    public static final String ARGUMENT_DATA_TYPE = "datatype";
-    public static final String ARGUMENT_FILE_FORMAT = "format";
-    public static final String ARGUMENT_DIR_PATH = "dir";
-    public static final String ARGUMENT_HELP = "help";
+    private static final String ARGUMENT_DATA_TYPE = "datatype";
+    private static final String ARGUMENT_FILE_FORMAT = "format";
+    private static final String ARGUMENT_DIR_PATH = "dir";
+    private static final String ARGUMENT_HELP = "help";
 
-    public static final String DATA_TYPE_TARGET_PRICE = "price";
-    public static final String DATA_TYPE_TARGET_WORK_HOURS = "time";
-    public static final String DATA_TYPE_TARGET_LOCATION = "location";
-    public static final String DATA_TYPE_TARGET_ALL = "all";
+    private static final String DATA_TYPE_TARGET_PRICE = "price";
+    private static final String DATA_TYPE_TARGET_WORK_HOURS = "time";
+    private static final String DATA_TYPE_TARGET_LOCATION = "location";
+    private static final String DATA_TYPE_TARGET_ALL = "all";
 
-    public static final String HELP_PRINTOUT_FORMAT = "%-12s %-35s %-50s\n";
+    private static final String HELP_PRINTOUT_FORMAT = "%-12s %-35s %-50s\n";
 
     public static void main(String[] args) {
         var arguments = createArguments();
@@ -44,8 +44,7 @@ public class Main {
 
             var fileFormats = cli.getArgumentTarget(ARGUMENT_FILE_FORMAT);
             if (fileFormats.isEmpty()) {
-                System.out.printf("--%s not set, using default value.", ARGUMENT_FILE_FORMAT);
-                System.out.println();
+                System.out.printf("--%s not set, using default value.\n", ARGUMENT_FILE_FORMAT);
             } else {
                 System.out.println("Output file formats: " + fileFormats);
             }
@@ -81,9 +80,23 @@ public class Main {
                     System.exit(-1);
                 }
             } else if (target.equals(DATA_TYPE_TARGET_WORK_HOURS)) {
-                System.out.println("Not supported yet ...");
+                try {
+                    System.out.println("Downloading parking work hours information ...");
+                    var workHoursInfo = parkingClient.fetchParkingWorkHours();
+                    System.out.println("Download finished.");
+                } catch (IOException e) {
+                    System.out.println("Failed to download parking work hours information: " + e.getMessage());
+                    System.exit(-1);
+                }
             } else if (target.equals(DATA_TYPE_TARGET_LOCATION)) {
-                System.out.println("Not supported yet ...");
+                try {
+                    System.out.println("Downloading parking zones/locations information ...");
+                    var locationInfo = parkingClient.fetchParkingLocations();
+                    System.out.println("Download finished.");
+                } catch (IOException e) {
+                    System.out.println("Failed to download parking zones/locations information: " + e.getMessage());
+                    System.exit(-1);
+                }
             } else if (target.equals(DATA_TYPE_TARGET_ALL)) {
                 System.out.println("Not supported yet ...");
             } else {
