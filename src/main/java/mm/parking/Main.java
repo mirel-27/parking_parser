@@ -3,6 +3,7 @@ package mm.parking;
 import mm.parking.cli.Argument;
 import mm.parking.cli.CommandLine;
 import mm.parking.client.ParkingClient;
+import mm.parking.parser.ParkingParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,11 +71,16 @@ public class Main {
             // only one target is expected, discard others
             var target = dataTargets.get(0);
             var parkingClient = new ParkingClient();
+            var parkingParser = new ParkingParser();
             if (target.equals(DATA_TYPE_TARGET_PRICE)) {
                 try {
                     System.out.println("Downloading parking price information ...");
                     var priceInfo = parkingClient.fetchParkingPrices();
                     System.out.println("Download finished.");
+                    System.out.println("Parsing parking pricing information ...");
+                    var prices = parkingParser.parseParkingPrices(priceInfo);
+                    System.out.println("Parsing finished.");
+                    System.out.println("Parsed information: " + prices);
                 } catch (IOException e) {
                     System.out.println("Failed to download parking price information: " + e.getMessage());
                     System.exit(-1);
