@@ -70,43 +70,55 @@ public class Main {
 
             // only one target is expected, discard others
             var target = dataTargets.get(0);
+
             var parkingClient = new ParkingClient();
             var parkingParser = new ParkingParser();
-            if (target.equals(DATA_TYPE_TARGET_PRICE)) {
-                try {
-                    System.out.println("Downloading parking price information ...");
-                    var priceInfo = parkingClient.fetchParkingPrices();
-                    System.out.println("Download finished.");
-                    System.out.println("Parsing parking pricing information ...");
-                    var prices = parkingParser.parseParkingPrices(priceInfo);
-                    System.out.println("Parsing finished.");
-                    System.out.println("Parsed information: " + prices);
-                } catch (IOException e) {
-                    System.out.println("Failed to download parking price information: " + e.getMessage());
-                    System.exit(-1);
-                }
-            } else if (target.equals(DATA_TYPE_TARGET_WORK_HOURS)) {
-                try {
-                    System.out.println("Downloading parking work hours information ...");
-                    var workHoursInfo = parkingClient.fetchParkingWorkHours();
-                    System.out.println("Download finished.");
-                } catch (IOException e) {
-                    System.out.println("Failed to download parking work hours information: " + e.getMessage());
-                    System.exit(-1);
-                }
-            } else if (target.equals(DATA_TYPE_TARGET_LOCATION)) {
-                try {
-                    System.out.println("Downloading parking zones/locations information ...");
-                    var locationInfo = parkingClient.fetchParkingLocations();
-                    System.out.println("Download finished.");
-                } catch (IOException e) {
-                    System.out.println("Failed to download parking zones/locations information: " + e.getMessage());
-                    System.exit(-1);
-                }
-            } else if (target.equals(DATA_TYPE_TARGET_ALL)) {
-                System.out.println("Not supported yet ...");
-            } else {
-                System.out.println("Unknown data target: " + target);
+
+            switch (target) {
+                case DATA_TYPE_TARGET_PRICE:
+                    try {
+                        System.out.println("Downloading parking price information ...");
+                        var priceInfo = parkingClient.fetchParkingPrices();
+                        System.out.println("Download finished.");
+                        System.out.println("Parsing parking pricing information ...");
+                        var prices = parkingParser.parseParkingPrices(priceInfo);
+                        System.out.println("Parsing finished.");
+                        System.out.println("Parsed information: " + prices);
+                    } catch (IOException e) {
+                        System.out.println("Failed to download parking price information: " + e.getMessage());
+                        System.exit(-1);
+                    }
+                    break;
+                case DATA_TYPE_TARGET_WORK_HOURS:
+                    try {
+                        System.out.println("Downloading parking work hours information ...");
+                        var workHoursInfo = parkingClient.fetchParkingWorkHours();
+                        System.out.println("Download finished.");
+                        System.out.println("Parsing parking work hours information ...");
+                        var parkingTimeData = parkingParser.parseParkingWorkHours(workHoursInfo);
+                        System.out.println("Parsing finished.");
+                        System.out.println("Parsed information: " + parkingTimeData);
+                    } catch (IOException e) {
+                        System.out.println("Failed to download parking work hours information: " + e.getMessage());
+                        System.exit(-1);
+                    }
+                    break;
+                case DATA_TYPE_TARGET_LOCATION:
+                    try {
+                        System.out.println("Downloading parking zones/locations information ...");
+                        var locationInfo = parkingClient.fetchParkingLocations();
+                        System.out.println("Download finished.");
+                    } catch (IOException e) {
+                        System.out.println("Failed to download parking zones/locations information: " + e.getMessage());
+                        System.exit(-1);
+                    }
+                    break;
+                case DATA_TYPE_TARGET_ALL:
+                    System.out.println("Not supported yet ...");
+                    break;
+                default:
+                    System.out.println("Unknown data target: " + target);
+                    break;
             }
         } catch (IllegalArgumentException e) {
             System.out.printf("Failed to parse arguments [%s]\n", e.getMessage());

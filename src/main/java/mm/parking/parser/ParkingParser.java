@@ -1,6 +1,7 @@
 package mm.parking.parser;
 
 import mm.parking.ParkingPrice;
+import mm.parking.ParkingTime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +72,38 @@ public class ParkingParser {
         }
 
         return prices;
+    }
+
+    public List<ParkingTime> parseParkingWorkHours(String data) {
+        var lines = tokenize(data, System.lineSeparator());
+
+        var workHours = new ArrayList<ParkingTime>();
+        var builder = ParkingTime.Builder.newBuilder();
+
+        // skip first and last index -> first = header, last = garage info (not needed now)
+        for (int i = 1; i < lines.length - 1; i++) {
+            var tokens = tokenize(lines[i], ";");
+
+            var zone = tokens[0];
+            var workDayInfo = tokens[1];
+            var saturdayInfo = tokens[2];
+            var sundayHolidayInfo = tokens[3];
+
+            // if parking time information for sunday equals "nema naplate" then it
+            // means that there is no parking charging on sunday for that zone/region
+            if (sundayHolidayInfo.startsWith("nema")) {
+                sundayHolidayInfo = "free";
+            }
+
+            var parkingTime = builder.zone(zone)
+                    .workDayHours(workDayInfo)
+                    .saturdayHours(saturdayInfo)
+                    .sundayHolidayHours(sundayHolidayInfo)
+                    .build();
+            workHours.add(parkingTime);
+        }
+
+        return workHours;
     }
 
     private String[] tokenize(String data, String delimiter) {
