@@ -118,7 +118,35 @@ public class Main {
                     }
                     break;
                 case DATA_TYPE_TARGET_ALL:
-                    System.out.println("Not supported yet ...");
+                    // TODO: Refactor later into separate methods when file formats and directory target are used
+                    try {
+                        System.out.println("Downloading parking price information ...");
+                        var priceInfo = parkingClient.fetchParkingPrices();
+                        System.out.println("Download finished.");
+                        System.out.println("Parsing parking pricing information ...");
+                        var prices = parkingParser.parseParkingPrices(priceInfo);
+                        System.out.println("Parsing finished.");
+                        System.out.println("Parsed information: " + prices);
+
+                        System.out.println("Downloading parking work hours information ...");
+                        var workHoursInfo = parkingClient.fetchParkingWorkHours();
+                        System.out.println("Download finished.");
+                        System.out.println("Parsing parking work hours information ...");
+                        var parkingTimeData = parkingParser.parseParkingWorkHours(workHoursInfo);
+                        System.out.println("Parsing finished.");
+                        System.out.println("Parsed information: " + parkingTimeData);
+
+                        System.out.println("Downloading parking zones/locations information ...");
+                        var locationInfo = parkingClient.fetchParkingLocations();
+                        System.out.println("Download finished.");
+                        System.out.println("Parsing parking locations information ...");
+                        var locations = parkingParser.parseParkingLocations(locationInfo);
+                        System.out.println("Parsing finished.");
+                        System.out.println("Parsed information: " + locations);
+                    } catch (IOException e) {
+                        System.out.println("Failed to perform action: " + e.getMessage());
+                        System.exit(-1);
+                    }
                     break;
                 default:
                     System.out.println("Unknown data target: " + target);
