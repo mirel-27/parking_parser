@@ -1,5 +1,6 @@
 package mm.parking.parser;
 
+import mm.parking.ParkingLocation;
 import mm.parking.ParkingPrice;
 import mm.parking.ParkingTime;
 
@@ -104,6 +105,29 @@ public class ParkingParser {
         }
 
         return workHours;
+    }
+
+    public List<ParkingLocation> parseParkingLocations(String data) {
+        var lines = tokenize(data, System.lineSeparator());
+
+        var locations = new ArrayList<ParkingLocation>();
+        for (String line : lines) {
+            var tokens = tokenize(line, ";");
+            var zone = tokens[0];
+            var address = tokens[1];
+            var city = "Zagreb";
+
+            // TODO: Check how to format "address" since some have additional information
+
+            var parkingLocation = ParkingLocation.Builder.newBuilder()
+                    .zone(zone)
+                    .city(city)
+                    .address(address)
+                    .build();
+            locations.add(parkingLocation);
+        }
+
+        return locations;
     }
 
     private String[] tokenize(String data, String delimiter) {

@@ -108,6 +108,10 @@ public class Main {
                         System.out.println("Downloading parking zones/locations information ...");
                         var locationInfo = parkingClient.fetchParkingLocations();
                         System.out.println("Download finished.");
+                        System.out.println("Parsing parking locations information ...");
+                        var locations = parkingParser.parseParkingLocations(locationInfo);
+                        System.out.println("Parsing finished.");
+                        System.out.println("Parsed information: " + locations);
                     } catch (IOException e) {
                         System.out.println("Failed to download parking zones/locations information: " + e.getMessage());
                         System.exit(-1);

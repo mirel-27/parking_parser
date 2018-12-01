@@ -63,6 +63,10 @@ public class ParkingTime {
         private String saturdayHours;
         private String sundayHolidayHours;
 
+        private Builder() {
+
+        }
+
         public static Builder newBuilder() {
             return new Builder();
         }
