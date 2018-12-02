@@ -90,8 +90,13 @@ public class ParkingParser {
             var saturdayInfo = tokens[2];
             var sundayHolidayInfo = tokens[3];
 
-            // if parking time information for sunday equals "nema naplate" then it
-            // means that there is no parking charging on sunday for that zone/region
+            // if parking time information for saturday/sunday equals "nema naplate" then it
+            // means that there is no parking charging on saturday/sunday for that zone/region
+
+            if (saturdayInfo.startsWith("nema")) {
+                saturdayInfo = "free";
+            }
+
             if (sundayHolidayInfo.startsWith("nema")) {
                 sundayHolidayInfo = "free";
             }
