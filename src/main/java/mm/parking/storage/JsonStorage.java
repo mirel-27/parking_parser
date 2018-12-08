@@ -28,7 +28,7 @@ public class JsonStorage extends FileStorage {
     }
 
     @Override
-    public void storeWorKHours(List<ParkingTime> workHours) throws IOException {
+    public void storeWorkHours(List<ParkingTime> workHours) throws IOException {
         Type type = new TypeToken<List<ParkingTime>>(){}.getType();
         write(workHours, type, "work_hours.json");
     }

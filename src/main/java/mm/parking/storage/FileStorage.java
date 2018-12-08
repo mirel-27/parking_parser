@@ -20,7 +20,7 @@ public abstract class FileStorage {
 
     public abstract void storePrices(List<ParkingPrice> prices) throws IOException;
 
-    public abstract void storeWorKHours(List<ParkingTime> workTimeList) throws IOException;
+    public abstract void storeWorkHours(List<ParkingTime> workTimeList) throws IOException;
 
     public abstract void storeLocations(List<ParkingLocation> locations) throws IOException;
 }
