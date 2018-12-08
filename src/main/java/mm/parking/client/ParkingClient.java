@@ -1,6 +1,10 @@
 package mm.parking.client;
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.Map;
@@ -34,14 +38,14 @@ public class ParkingClient {
     }
 
     public String fetchParkingLocations() throws IOException {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
         // download all entries and build output string
-        for (var entry : zoneMap.entrySet()) {
-            var zone = entry.getValue();
-            var fullUrl = URL_PARKING_LOCATIONS + entry.getKey();
-            var connection = Jsoup.connect(fullUrl);
-            var document = connection.get();
+        for (Map.Entry<Integer, String> entry : zoneMap.entrySet()) {
+            String zone = entry.getValue();
+            String fullUrl = URL_PARKING_LOCATIONS + entry.getKey();
+            Connection connection = Jsoup.connect(fullUrl);
+            Document document = connection.get();
 
             /*
             * The data is contained in a table for each document.
@@ -62,12 +66,12 @@ public class ParkingClient {
             * */
 
             // get the data table
-            var tables = document.getElementsByTag("table");
-            var targetTable = tables.get(0);
+            Elements tables = document.getElementsByTag("table");
+            Element targetTable = tables.get(0);
 
-            var rows = targetTable.getElementsByTag("tr");
+            Elements rows = targetTable.getElementsByTag("tr");
             rows.forEach(row -> {
-                var columns = row.getElementsByTag("td");
+                Elements columns = row.getElementsByTag("td");
                 columns.forEach(column -> {
                     sb.append(zone)
                             .append(DEFAULT_DELIMITER)
@@ -77,14 +81,14 @@ public class ParkingClient {
             });
         }
 
-        var data = sb.toString();
+        String data = sb.toString();
 
         return data;
     }
 
     private String fetch(String url) throws IOException {
-        var connection = Jsoup.connect(url);
-        var document = connection.get();
+        Connection connection = Jsoup.connect(url);
+        Document document = connection.get();
 
         /*
          *  The data we need is contained inside a table which is part of pageContent div.
@@ -116,23 +120,23 @@ public class ParkingClient {
          *  string variable and returned to the caller.
          * */
 
-        var pageContentDiv = document.getElementsByClass("pageContent");
-        var tables = pageContentDiv.get(0).getElementsByTag("table");
-        var targetTable = tables.get(0);
+        Elements pageContentDiv = document.getElementsByClass("pageContent");
+        Elements tables = pageContentDiv.get(0).getElementsByTag("table");
+        Element targetTable = tables.get(0);
 
-        var rows = targetTable.getElementsByTag("tr");
-        var sb = new StringBuilder();
+        Elements rows = targetTable.getElementsByTag("tr");
+        StringBuilder sb = new StringBuilder();
 
         // extract data from each row/column with ; -> semicolon as default delimiter
         rows.forEach(row -> {
-            var columns = row.getElementsByTag("td");
+            Elements columns = row.getElementsByTag("td");
             columns.forEach(column -> {
                 sb.append(column.text()).append(DEFAULT_DELIMITER);
             });
             sb.append(System.lineSeparator());
         });
 
-        var data = sb.toString();
+        String data = sb.toString();
 
         return data;
     }

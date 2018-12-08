@@ -10,8 +10,8 @@ import java.util.List;
 public class ParkingParser {
 
     public List<ParkingPrice> parseParkingPrices(String data) {
-        var prices = new ArrayList<ParkingPrice>();
-        var lines = tokenize(data, System.lineSeparator());
+        List<ParkingPrice> prices = new ArrayList<>();
+        String[] lines = tokenize(data, System.lineSeparator());
 
         /*
         * Data format:
@@ -22,23 +22,23 @@ public class ParkingParser {
         * */
 
         // skip the first line, it is header line
-        var builder = ParkingPrice.Builder.newBuilder();
+        ParkingPrice.Builder builder = ParkingPrice.Builder.newBuilder();
         for (int i = 1; i < lines.length; i++) {
             // expected token count = 5
-            var tokens = tokenize(lines[i], ";");
+            String[] tokens = tokenize(lines[i], ";");
 
-            var zone = tokens[0];
-            var phone = tokens[1];
+            String zone = tokens[0];
+            String phone = tokens[1];
 
             double hourlyPrice = 0;
             if (!tokens[2].equals("/")) {
-                var hourlyPriceTokens = tokenize(tokens[2], " ");
+                String[] hourlyPriceTokens = tokenize(tokens[2], " ");
                 hourlyPrice = Double.parseDouble(hourlyPriceTokens[0].replace(',', '.'));
             }
 
             double dailyPrice = 0;
             if (!tokens[3].equals("/")) {
-                var dailyPriceTokens = tokenize(tokens[3], " ");
+                String[] dailyPriceTokens = tokenize(tokens[3], " ");
                 dailyPrice = Double.parseDouble(dailyPriceTokens[0].replace(',', '.'));
             }
 
@@ -62,7 +62,7 @@ public class ParkingParser {
                 maxHours = 0;
             }
 
-            var parkingPrice = builder.zone(zone)
+            ParkingPrice parkingPrice = builder.zone(zone)
                     .phoneNumber(phone)
                     .hourlyPrice(hourlyPrice)
                     .dailyPrice(dailyPrice)
@@ -76,19 +76,19 @@ public class ParkingParser {
     }
 
     public List<ParkingTime> parseParkingWorkHours(String data) {
-        var lines = tokenize(data, System.lineSeparator());
+        String[] lines = tokenize(data, System.lineSeparator());
 
-        var workHours = new ArrayList<ParkingTime>();
-        var builder = ParkingTime.Builder.newBuilder();
+        List<ParkingTime> workHours = new ArrayList<ParkingTime>();
+        ParkingTime.Builder builder = ParkingTime.Builder.newBuilder();
 
         // skip first and last index -> first = header, last = garage info (not needed now)
         for (int i = 1; i < lines.length - 1; i++) {
-            var tokens = tokenize(lines[i], ";");
+            String[] tokens = tokenize(lines[i], ";");
 
-            var zone = tokens[0];
-            var workDayInfo = tokens[1];
-            var saturdayInfo = tokens[2];
-            var sundayHolidayInfo = tokens[3];
+            String zone = tokens[0];
+            String workDayInfo = tokens[1];
+            String saturdayInfo = tokens[2];
+            String sundayHolidayInfo = tokens[3];
 
             // if parking time information for saturday/sunday equals "nema naplate" then it
             // means that there is no parking charging on saturday/sunday for that zone/region
@@ -101,7 +101,7 @@ public class ParkingParser {
                 sundayHolidayInfo = "free";
             }
 
-            var parkingTime = builder.zone(zone)
+            ParkingTime parkingTime = builder.zone(zone)
                     .workDayHours(workDayInfo)
                     .saturdayHours(saturdayInfo)
                     .sundayHolidayHours(sundayHolidayInfo)
@@ -113,18 +113,18 @@ public class ParkingParser {
     }
 
     public List<ParkingLocation> parseParkingLocations(String data) {
-        var lines = tokenize(data, System.lineSeparator());
+        String[] lines = tokenize(data, System.lineSeparator());
 
-        var locations = new ArrayList<ParkingLocation>();
+        List<ParkingLocation> locations = new ArrayList<ParkingLocation>();
         for (String line : lines) {
-            var tokens = tokenize(line, ";");
-            var zone = tokens[0];
-            var address = tokens[1];
-            var city = "Zagreb";
+            String[] tokens = tokenize(line, ";");
+            String zone = tokens[0];
+            String address = tokens[1];
+            String city = "Zagreb";
 
             // TODO: Check how to format "address" since some have additional information
 
-            var parkingLocation = ParkingLocation.Builder.newBuilder()
+            ParkingLocation parkingLocation = ParkingLocation.Builder.newBuilder()
                     .zone(zone)
                     .city(city)
                     .address(address)

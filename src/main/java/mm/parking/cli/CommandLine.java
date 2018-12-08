@@ -12,8 +12,8 @@ public class CommandLine {
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("--")) {
-                var argString = args[i].substring(2);
-                var argument = findArgument(argString, arguments);
+                String argString = args[i].substring(2);
+                Argument argument = findArgument(argString, arguments);
                 if (argument == null) {
                     throw new IllegalArgumentException("Unknown arg = " + argString);
                 }
@@ -24,12 +24,12 @@ public class CommandLine {
     }
 
     public List<String> getArgumentTarget(String arg) {
-        var index = parsedArguments.get(arg);
+        Integer index = parsedArguments.get(arg);
         if (index == null) {
             return Collections.emptyList();
         }
 
-        var targets = new ArrayList<String>();
+        List<String> targets = new ArrayList<>();
 
         do {
             index++;

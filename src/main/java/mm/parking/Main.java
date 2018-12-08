@@ -23,8 +23,8 @@ public class Main {
     private static final String HELP_PRINTOUT_FORMAT = "%-12s %-35s %-50s\n";
 
     public static void main(String[] args) {
-        var arguments = createArguments();
-        var cli = new CommandLine();
+        List<Argument> arguments = createArguments();
+        CommandLine cli = new CommandLine();
 
         try {
             cli.parse(args, arguments);
@@ -36,28 +36,28 @@ public class Main {
 
             System.out.println("Parsing arguments ...");
 
-            var dataTargets = cli.getArgumentTarget(ARGUMENT_DATA_TYPE);
+            List<String> dataTargets = cli.getArgumentTarget(ARGUMENT_DATA_TYPE);
             if (dataTargets.isEmpty()) {
                 System.out.printf("Required argument --%s not set.", ARGUMENT_DATA_TYPE);
                 System.out.println();
                 System.exit(-1);
             }
 
-            var fileFormats = cli.getArgumentTarget(ARGUMENT_FILE_FORMAT);
+            List<String> fileFormats = cli.getArgumentTarget(ARGUMENT_FILE_FORMAT);
             if (fileFormats.isEmpty()) {
                 System.out.printf("--%s not set, using default value.\n", ARGUMENT_FILE_FORMAT);
             } else {
                 System.out.println("Output file formats: " + fileFormats);
             }
 
-            var directoryTarget = cli.getArgumentTarget(ARGUMENT_DIR_PATH);
+            List<String> directoryTarget = cli.getArgumentTarget(ARGUMENT_DIR_PATH);
             if (directoryTarget.isEmpty()) {
                 System.out.printf("--%s not set, using default value.", ARGUMENT_DIR_PATH);
                 System.out.println();
             } else {
                 // only one target is expected
-                var dirPath = directoryTarget.get(0);
-                var file = new File(dirPath);
+                String dirPath = directoryTarget.get(0);
+                File file = new File(dirPath);
                 if (!file.isDirectory()) {
                     System.out.println("Not a directory: " + dirPath);
                     System.exit(-1);
@@ -69,19 +69,19 @@ public class Main {
             System.out.println("Parsing arguments done.");
 
             // only one target is expected, discard others
-            var target = dataTargets.get(0);
+            String target = dataTargets.get(0);
 
-            var parkingClient = new ParkingClient();
-            var parkingParser = new ParkingParser();
+            ParkingClient parkingClient = new ParkingClient();
+            ParkingParser parkingParser = new ParkingParser();
 
             switch (target) {
                 case DATA_TYPE_TARGET_PRICE:
                     try {
                         System.out.println("Downloading parking price information ...");
-                        var priceInfo = parkingClient.fetchParkingPrices();
+                        String priceInfo = parkingClient.fetchParkingPrices();
                         System.out.println("Download finished.");
                         System.out.println("Parsing parking pricing information ...");
-                        var prices = parkingParser.parseParkingPrices(priceInfo);
+                        List<ParkingPrice> prices = parkingParser.parseParkingPrices(priceInfo);
                         System.out.println("Parsing finished.");
                         System.out.println("Parsed information: " + prices);
                     } catch (IOException e) {
@@ -92,10 +92,10 @@ public class Main {
                 case DATA_TYPE_TARGET_WORK_HOURS:
                     try {
                         System.out.println("Downloading parking work hours information ...");
-                        var workHoursInfo = parkingClient.fetchParkingWorkHours();
+                        String workHoursInfo = parkingClient.fetchParkingWorkHours();
                         System.out.println("Download finished.");
                         System.out.println("Parsing parking work hours information ...");
-                        var parkingTimeData = parkingParser.parseParkingWorkHours(workHoursInfo);
+                        List<ParkingTime> parkingTimeData = parkingParser.parseParkingWorkHours(workHoursInfo);
                         System.out.println("Parsing finished.");
                         System.out.println("Parsed information: " + parkingTimeData);
                     } catch (IOException e) {
@@ -106,10 +106,10 @@ public class Main {
                 case DATA_TYPE_TARGET_LOCATION:
                     try {
                         System.out.println("Downloading parking zones/locations information ...");
-                        var locationInfo = parkingClient.fetchParkingLocations();
+                        String locationInfo = parkingClient.fetchParkingLocations();
                         System.out.println("Download finished.");
                         System.out.println("Parsing parking locations information ...");
-                        var locations = parkingParser.parseParkingLocations(locationInfo);
+                        List<ParkingLocation> locations = parkingParser.parseParkingLocations(locationInfo);
                         System.out.println("Parsing finished.");
                         System.out.println("Parsed information: " + locations);
                     } catch (IOException e) {
@@ -121,26 +121,26 @@ public class Main {
                     // TODO: Refactor later into separate methods when file formats and directory target are used
                     try {
                         System.out.println("Downloading parking price information ...");
-                        var priceInfo = parkingClient.fetchParkingPrices();
+                        String priceInfo = parkingClient.fetchParkingPrices();
                         System.out.println("Download finished.");
                         System.out.println("Parsing parking pricing information ...");
-                        var prices = parkingParser.parseParkingPrices(priceInfo);
+                        List<ParkingPrice> prices = parkingParser.parseParkingPrices(priceInfo);
                         System.out.println("Parsing finished.");
                         System.out.println("Parsed information: " + prices);
 
                         System.out.println("Downloading parking work hours information ...");
-                        var workHoursInfo = parkingClient.fetchParkingWorkHours();
+                        String workHoursInfo = parkingClient.fetchParkingWorkHours();
                         System.out.println("Download finished.");
                         System.out.println("Parsing parking work hours information ...");
-                        var parkingTimeData = parkingParser.parseParkingWorkHours(workHoursInfo);
+                        List<ParkingTime> parkingTimeData = parkingParser.parseParkingWorkHours(workHoursInfo);
                         System.out.println("Parsing finished.");
                         System.out.println("Parsed information: " + parkingTimeData);
 
                         System.out.println("Downloading parking zones/locations information ...");
-                        var locationInfo = parkingClient.fetchParkingLocations();
+                        String locationInfo = parkingClient.fetchParkingLocations();
                         System.out.println("Download finished.");
                         System.out.println("Parsing parking locations information ...");
-                        var locations = parkingParser.parseParkingLocations(locationInfo);
+                        List<ParkingLocation> locations = parkingParser.parseParkingLocations(locationInfo);
                         System.out.println("Parsing finished.");
                         System.out.println("Parsed information: " + locations);
                     } catch (IOException e) {
@@ -167,9 +167,9 @@ public class Main {
 
     private static void printHelp() {
         System.out.println("ParkingParser help");
-        var arg = "Argument";
-        var values = "Values";
-        var description = "Description";
+        String arg = "Argument";
+        String values = "Values";
+        String description = "Description";
         System.out.printf(HELP_PRINTOUT_FORMAT, arg, values, description);
         System.out.println();
 
