@@ -56,13 +56,11 @@ public class ParkingPrice {
 
     @Override
     public String toString() {
-        return "ParkingPrice{" +
-                "zone='" + zone + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", hourlyPrice=" + hourlyPrice +
-                ", dailyPrice=" + dailyPrice +
-                ", maxHours=" + maxHours +
-                '}';
+        return "zone=" + zone + " " +
+                "phone=" + phoneNumber + " " +
+                "hourly=" + hourlyPrice + " " +
+                "daily=" + dailyPrice + " " +
+                "max_hours=" + maxHours;
     }
 
     public static class Builder {

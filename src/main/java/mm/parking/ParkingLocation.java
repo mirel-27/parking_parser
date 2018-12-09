@@ -42,11 +42,9 @@ public class ParkingLocation {
 
     @Override
     public String toString() {
-        return "ParkingLocation{" +
-                "zone='" + zone + '\'' +
-                ", city='" + city + '\'' +
-                ", address='" + address + '\'' +
-                '}';
+        return "zone=" + zone + " " +
+                "city=" + city + " " +
+                "address=" + address;
     }
 
     public static class Builder {

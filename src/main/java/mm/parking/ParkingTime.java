@@ -49,12 +49,11 @@ public class ParkingTime {
 
     @Override
     public String toString() {
-        return "ParkingTime{" +
-                "zone='" + zone + '\'' +
-                ", workDayHours='" + workDayHours + '\'' +
-                ", saturdayHours='" + saturdayHours + '\'' +
-                ", sundayHolidayHours='" + sundayHolidayHours + '\'' +
-                '}';
+        return "zone=" + zone + " " +
+                "work_day=" + workDayHours + " " +
+                "saturday=" + saturdayHours + " " +
+                "sunday=" + sundayHolidayHours + " " +
+                "holiday=" + sundayHolidayHours;
     }
 
     public static class Builder {
