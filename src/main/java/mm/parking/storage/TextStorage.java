@@ -17,26 +17,26 @@ public class TextStorage extends FileStorage {
     }
 
     @Override
-    public void storePrices(List<ParkingPrice> prices) throws IOException {
+    public void storePrices(List<ParkingPrice> prices, String filename) throws IOException {
         List<String> data = prices.stream()
                 .map(ParkingPrice::toString)
                 .collect(Collectors.toList());
-        Files.write(Paths.get(getDirPath() + "prices.txt"), data);
+        Files.write(Paths.get(getDirPath() + filename), data);
     }
 
     @Override
-    public void storeWorkHours(List<ParkingTime> workTimeList) throws IOException {
+    public void storeWorkHours(List<ParkingTime> workTimeList, String filename) throws IOException {
         List<String> data = workTimeList.stream()
                 .map(ParkingTime::toString)
                 .collect(Collectors.toList());
-        Files.write(Paths.get(getDirPath() + "work_hours.txt"), data);
+        Files.write(Paths.get(getDirPath() + filename), data);
     }
 
     @Override
-    public void storeLocations(List<ParkingLocation> locations) throws IOException {
+    public void storeLocations(List<ParkingLocation> locations, String filename) throws IOException {
         List<String> data = locations.stream()
                 .map(ParkingLocation::toString)
                 .collect(Collectors.toList());
-        Files.write(Paths.get(getDirPath() + "locations.txt"), data);
+        Files.write(Paths.get(getDirPath() + filename), data);
     }
 }

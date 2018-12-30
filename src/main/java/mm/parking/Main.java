@@ -1,9 +1,15 @@
 package mm.parking;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import mm.parking.cli.Argument;
 import mm.parking.cli.CommandLine;
 import mm.parking.client.ParkingClient;
 import mm.parking.parser.ParkingParser;
+import mm.parking.storage.FileStorage;
+import mm.parking.storage.JsonStorage;
+import mm.parking.storage.TextStorage;
+import mm.parking.storage.XmlStorage;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +27,13 @@ public class Main {
     private static final String DATA_TYPE_TARGET_ALL = "all";
 
     private static final String HELP_PRINTOUT_FORMAT = "%-12s %-35s %-50s\n";
+
+    private static ParkingClient parkingClient;
+    private static ParkingParser parkingParser;
+
+    private static FileStorage xmlStorage;
+    private static FileStorage jsonStorage;
+    private static FileStorage textStorage;
 
     public static void main(String[] args) {
         List<Argument> arguments = createArguments();
@@ -45,18 +58,22 @@ public class Main {
 
             List<String> fileFormats = cli.getArgumentTarget(ARGUMENT_FILE_FORMAT);
             if (fileFormats.isEmpty()) {
-                System.out.printf("--%s not set, using default value.\n", ARGUMENT_FILE_FORMAT);
+                System.out.printf("--%s not set, using default - all.\n", ARGUMENT_FILE_FORMAT);
+                fileFormats.add("all");
             } else {
-                System.out.println("Output file formats: " + fileFormats);
+                for (String format : fileFormats) {
+                    System.out.println("Output file format: " + format);
+                }
             }
 
+            String dirPath = "";
             List<String> directoryTarget = cli.getArgumentTarget(ARGUMENT_DIR_PATH);
             if (directoryTarget.isEmpty()) {
-                System.out.printf("--%s not set, using default value.", ARGUMENT_DIR_PATH);
+                System.out.printf("--%s not set, using default directory.", ARGUMENT_DIR_PATH);
                 System.out.println();
             } else {
                 // only one target is expected
-                String dirPath = directoryTarget.get(0);
+                dirPath = directoryTarget.get(0);
                 File file = new File(dirPath);
                 if (!file.isDirectory()) {
                     System.out.println("Not a directory: " + dirPath);
@@ -68,83 +85,52 @@ public class Main {
 
             System.out.println("Parsing arguments done.");
 
+            Gson gson = new GsonBuilder()
+                    .setPrettyPrinting()
+                    .create();
+
+            // create static objects
+            parkingClient = new ParkingClient();
+            parkingParser = new ParkingParser();
+
+            xmlStorage = new XmlStorage(dirPath);
+            textStorage = new TextStorage(dirPath);
+            jsonStorage = new JsonStorage(dirPath, gson);
+
             // only one target is expected, discard others
             String target = dataTargets.get(0);
-
-            ParkingClient parkingClient = new ParkingClient();
-            ParkingParser parkingParser = new ParkingParser();
-
             switch (target) {
                 case DATA_TYPE_TARGET_PRICE:
                     try {
-                        System.out.println("Downloading parking price information ...");
-                        String priceInfo = parkingClient.fetchParkingPrices();
-                        System.out.println("Download finished.");
-                        System.out.println("Parsing parking pricing information ...");
-                        List<ParkingPrice> prices = parkingParser.parseParkingPrices(priceInfo);
-                        System.out.println("Parsing finished.");
-                        System.out.println("Parsed information: " + prices);
+                        getPrices(fileFormats);
                     } catch (IOException e) {
-                        System.out.println("Failed to download parking price information: " + e.getMessage());
+                        System.out.println("Error occurred" + e.getMessage());
                         System.exit(-1);
                     }
                     break;
                 case DATA_TYPE_TARGET_WORK_HOURS:
                     try {
-                        System.out.println("Downloading parking work hours information ...");
-                        String workHoursInfo = parkingClient.fetchParkingWorkHours();
-                        System.out.println("Download finished.");
-                        System.out.println("Parsing parking work hours information ...");
-                        List<ParkingTime> parkingTimeData = parkingParser.parseParkingWorkHours(workHoursInfo);
-                        System.out.println("Parsing finished.");
-                        System.out.println("Parsed information: " + parkingTimeData);
+                        getWorkHours(fileFormats);
                     } catch (IOException e) {
-                        System.out.println("Failed to download parking work hours information: " + e.getMessage());
+                        System.out.println("Error occurred: " + e.getMessage());
                         System.exit(-1);
                     }
                     break;
                 case DATA_TYPE_TARGET_LOCATION:
                     try {
-                        System.out.println("Downloading parking zones/locations information ...");
-                        String locationInfo = parkingClient.fetchParkingLocations();
-                        System.out.println("Download finished.");
-                        System.out.println("Parsing parking locations information ...");
-                        List<ParkingLocation> locations = parkingParser.parseParkingLocations(locationInfo);
-                        System.out.println("Parsing finished.");
-                        System.out.println("Parsed information: " + locations);
+                        getLocations(fileFormats);
                     } catch (IOException e) {
-                        System.out.println("Failed to download parking zones/locations information: " + e.getMessage());
+                        System.out.println("Error occurred: " + e.getMessage());
                         System.exit(-1);
                     }
                     break;
                 case DATA_TYPE_TARGET_ALL:
-                    // TODO: Refactor later into separate methods when file formats and directory target are used
                     try {
-                        System.out.println("Downloading parking price information ...");
-                        String priceInfo = parkingClient.fetchParkingPrices();
-                        System.out.println("Download finished.");
-                        System.out.println("Parsing parking pricing information ...");
-                        List<ParkingPrice> prices = parkingParser.parseParkingPrices(priceInfo);
-                        System.out.println("Parsing finished.");
-                        System.out.println("Parsed information: " + prices);
-
-                        System.out.println("Downloading parking work hours information ...");
-                        String workHoursInfo = parkingClient.fetchParkingWorkHours();
-                        System.out.println("Download finished.");
-                        System.out.println("Parsing parking work hours information ...");
-                        List<ParkingTime> parkingTimeData = parkingParser.parseParkingWorkHours(workHoursInfo);
-                        System.out.println("Parsing finished.");
-                        System.out.println("Parsed information: " + parkingTimeData);
-
-                        System.out.println("Downloading parking zones/locations information ...");
-                        String locationInfo = parkingClient.fetchParkingLocations();
-                        System.out.println("Download finished.");
-                        System.out.println("Parsing parking locations information ...");
-                        List<ParkingLocation> locations = parkingParser.parseParkingLocations(locationInfo);
-                        System.out.println("Parsing finished.");
-                        System.out.println("Parsed information: " + locations);
+                        getPrices(fileFormats);
+                        getWorkHours(fileFormats);
+                        getLocations(fileFormats);
                     } catch (IOException e) {
-                        System.out.println("Failed to perform action: " + e.getMessage());
+                        System.out.println("Error occurred: " + e.getMessage());
                         System.exit(-1);
                     }
                     break;
@@ -155,6 +141,96 @@ public class Main {
         } catch (IllegalArgumentException e) {
             System.out.printf("Failed to parse arguments [%s]\n", e.getMessage());
         }
+    }
+
+    private static void getPrices(List<String> fileFormats) throws IOException {
+        System.out.println("Downloading parking price information ...");
+        String priceInfo = parkingClient.fetchParkingPrices();
+        System.out.println("Download finished.");
+
+        System.out.println("Parsing parking pricing information ...");
+        List<ParkingPrice> prices = parkingParser.parseParkingPrices(priceInfo);
+        System.out.println("Parsing finished.");
+        System.out.println("Parsed information: " + prices);
+
+        System.out.println("Writing information to disk ...");
+        String filename = "prices";
+        if (fileFormats.contains("all")) {
+            xmlStorage.storePrices(prices, filename + ".xml");
+            jsonStorage.storePrices(prices, filename + ".json");
+            textStorage.storePrices(prices, filename + ".txt");
+        } else {
+            if (fileFormats.contains("xml")) {
+                xmlStorage.storePrices(prices, filename + ".xml");
+            }
+            if (fileFormats.contains("json")) {
+                jsonStorage.storePrices(prices, filename + ".json");
+            }
+            if (fileFormats.contains("raw")) {
+                textStorage.storePrices(prices, filename + ".txt");
+            }
+        }
+        System.out.println("Information written to disk.");
+    }
+
+    private static void getWorkHours(List<String> fileFormats) throws IOException {
+        System.out.println("Downloading parking work hours information ...");
+        String workHoursInfo = parkingClient.fetchParkingWorkHours();
+        System.out.println("Download finished.");
+
+        System.out.println("Parsing parking work hours information ...");
+        List<ParkingTime> parkingTimeData = parkingParser.parseParkingWorkHours(workHoursInfo);
+        System.out.println("Parsing finished.");
+        System.out.println("Parsed information: " + parkingTimeData);
+
+        System.out.println("Writing information to disk ...");
+        String filename = "work_hours";
+        if (fileFormats.contains("all")) {
+            xmlStorage.storeWorkHours(parkingTimeData, filename + ".xml");
+            jsonStorage.storeWorkHours(parkingTimeData, filename + ".json");
+            textStorage.storeWorkHours(parkingTimeData, filename + ".txt");
+        } else {
+            if (fileFormats.contains("xml")) {
+                xmlStorage.storeWorkHours(parkingTimeData, filename + ".xml");
+            }
+            if (fileFormats.contains("json")) {
+                jsonStorage.storeWorkHours(parkingTimeData, filename + ".json");
+            }
+            if (fileFormats.contains("raw")) {
+                textStorage.storeWorkHours(parkingTimeData, filename + ".txt");
+            }
+        }
+        System.out.println("Information written to disk.");
+    }
+
+    private static void getLocations(List<String> fileFormats) throws IOException {
+        System.out.println("Downloading parking zones/locations information ...");
+        String locationInfo = parkingClient.fetchParkingLocations();
+        System.out.println("Download finished.");
+
+        System.out.println("Parsing parking locations information ...");
+        List<ParkingLocation> locations = parkingParser.parseParkingLocations(locationInfo);
+        System.out.println("Parsing finished.");
+        System.out.println("Parsed information: " + locations);
+
+        System.out.println("Writing information to disk ...");
+        String filename = "locations";
+        if (fileFormats.contains("all")) {
+            xmlStorage.storeLocations(locations, filename + ".xml");
+            jsonStorage.storeLocations(locations, filename + ".json");
+            textStorage.storeLocations(locations, filename + ".txt");
+        } else {
+            if (fileFormats.contains("xml")) {
+                xmlStorage.storeLocations(locations, filename + ".xml");
+            }
+            if (fileFormats.contains("json")) {
+                jsonStorage.storeLocations(locations, filename + ".json");
+            }
+            if (fileFormats.contains("raw")) {
+                textStorage.storeLocations(locations, filename + ".txt");
+            }
+        }
+        System.out.println("Information written to disk.");
     }
 
     private static List<Argument> createArguments() {

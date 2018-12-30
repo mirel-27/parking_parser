@@ -18,9 +18,9 @@ public abstract class FileStorage {
         return dirPath;
     }
 
-    public abstract void storePrices(List<ParkingPrice> prices) throws IOException;
+    public abstract void storePrices(List<ParkingPrice> prices, String filename) throws IOException;
 
-    public abstract void storeWorkHours(List<ParkingTime> workTimeList) throws IOException;
+    public abstract void storeWorkHours(List<ParkingTime> workTimeList, String filename) throws IOException;
 
-    public abstract void storeLocations(List<ParkingLocation> locations) throws IOException;
+    public abstract void storeLocations(List<ParkingLocation> locations, String filename) throws IOException;
 }

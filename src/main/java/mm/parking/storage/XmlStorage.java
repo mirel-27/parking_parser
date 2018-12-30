@@ -23,7 +23,7 @@ public class XmlStorage extends FileStorage {
     }
 
     @Override
-    public void storePrices(List<ParkingPrice> prices) throws IOException {
+    public void storePrices(List<ParkingPrice> prices, String filename) throws IOException {
         try {
             Document document = newDocument();
             Element root = document.createElement("parkingprices");
@@ -53,14 +53,14 @@ public class XmlStorage extends FileStorage {
 
                 root.appendChild(priceNode);
             });
-            write(document, "prices.xml");
+            write(document, filename);
         } catch (ParserConfigurationException | TransformerException e ) {
             throw new IOException("XML configuration error: " + e.getMessage());
         }
     }
 
     @Override
-    public void storeWorkHours(List<ParkingTime> workTimeList) throws IOException {
+    public void storeWorkHours(List<ParkingTime> workTimeList, String filename) throws IOException {
         try {
             Document document = newDocument();
             Element root = document.createElement("workhours");
@@ -90,14 +90,14 @@ public class XmlStorage extends FileStorage {
 
                 root.appendChild(workHourNode);
             });
-            write(document, "work_hours.xml");
+            write(document, filename);
         } catch (ParserConfigurationException | TransformerException e ) {
             throw new IOException("XML configuration error: " + e.getMessage());
         }
     }
 
     @Override
-    public void storeLocations(List<ParkingLocation> locations) throws IOException {
+    public void storeLocations(List<ParkingLocation> locations, String filename) throws IOException {
         try {
             Document document = newDocument();
             Element root = document.createElement("parkinglocations");
@@ -119,7 +119,7 @@ public class XmlStorage extends FileStorage {
 
                 root.appendChild(locationNode);
             });
-            write(document, "locations.xml");
+            write(document, filename);
         } catch (ParserConfigurationException | TransformerException e ) {
             throw new IOException("XML configuration error: " + e.getMessage());
         }
